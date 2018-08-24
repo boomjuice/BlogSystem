@@ -1,0 +1,66 @@
+{% extends 'backend/backend.html' %}
+{% load dealwithtime %}
+{% block css %}
+    <style>
+      .srcrow {
+            background: wheat;
+            border-left: 4px solid indianred;
+            border-top: 2px dashed #eeeeee;
+            border-bottom: 2px dashed #eeeeee;
+        }
+     .btn-primary {
+            border-radius: 0%;
+        }
+    .article-list {
+            margin-top: 16px;
+            margin-left: 20px;
+            margin-right: 20px;
+            border: 2px solid #eeeeee;
+        }
+
+        .article-list td i, td a {
+            color: saddlebrown;
+            text-decoration: none;
+        }
+
+        .article-list td i {
+            opacity: 0.5;
+        }
+
+        .article-list .table tr:hover {
+            background: burlywood;
+        }
+
+        .article-list .table td i:hover {
+            opacity: 1;
+        }
+
+        .paginator {
+            margin-right: 20px;
+        }
+        .modal-backdrop.in{
+            opacity: 0;
+        }
+        .modal-backdrop{
+            z-index: -1;
+        }
+    </style>
+{% endblock %}
+{% block contents %}
+    <ol class="breadcrumb">
+        <li><a href="/backend/trouble">报障管理</a></li>
+        <li class="active">报障列表</li>
+    </ol>
+    <div class="srcrow">
+        <i class="fa fa-home" style="padding: 10px 10px"></i><span> 报障数目（{{ count }}篇）</span>
+        <div class="add-article right">
+            <a type="button" class="btn btn-primary" href="/backend/add-trouble">
+                <i class="glyphicon glyphicon-plus-sign"></i>
+                添加报账单
+            </a>
+        </div>
+    </div>
+        <h3>正在处理的报障单无法编辑</h3>
+{% endblock %}
+{% block jsp %}
+{% endblock %}

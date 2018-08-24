@@ -1,0 +1,207 @@
+{% extends 'backend/backend.html' %}
+{% block css %}
+    <style>
+
+        .srcrow {
+            background: wheat;
+            border-left: 4px solid indianred;
+            border-top: 2px dashed #eeeeee;
+            border-bottom: 2px dashed #eeeeee;
+        }
+
+        .filter-col {
+            height: 100px;
+            margin-top: 20px;
+        }
+
+        .filter-col .types a, .classify a {
+            text-decoration: none;
+            font-size: 18px;
+            margin-right: 25px;
+            padding: 5px 10px;
+        }
+
+        .types, .classify {
+            margin-top: 20px;
+            margin-left: 70px;
+        }
+
+        .btn-primary {
+            border-radius: 0%;
+        }
+
+        .article-list {
+            margin-top: 16px;
+            margin-left: 20px;
+            margin-right: 20px;
+            border: 2px solid #eeeeee;
+        }
+
+        .article-list td i, td a {
+            color: saddlebrown;
+            text-decoration: none;
+        }
+
+        .article-list td i {
+            opacity: 0.5;
+        }
+
+        .article-list .table tr:hover {
+            background: burlywood;
+        }
+
+        .article-list .table td i:hover {
+            opacity: 1;
+        }
+
+        .paginator {
+            margin-right: 20px;
+        }
+
+        .modal-backdrop.in {
+            opacity: 0;
+        }
+
+        .modal-backdrop {
+            z-index: -1;
+        }
+    </style>
+{% endblock %}
+{% block contents %}
+    <ol class="breadcrumb">
+        <li><a href="/backend/article-0-0">文章管理</a></li>
+        <li class="active">文章列表</li>
+    </ol>
+    <div class="search-row">
+        <div class="srcrow">
+            <i class="fa fa-search-plus" style="padding: 10px 10px"></i>
+            搜索文章
+        </div>
+    </div>
+    <div class="filter-col">
+        <div class="types">
+            <span style="font-size: 18px"> 默认分类：</span>
+            {% if kwargs.article_type_id == 0 %}
+                <a class="filter-active" href="/backend/article-0-{{ kwargs.classify_id }}">全部</a>
+            {% else %}
+                <a href="/backend/article-0-{{ kwargs.classify_id }}">全部</a>
+            {% endif %}
+            {% for type in types %}
+                {% if  type.0 == kwargs.article_type_id %}
+                    <a class='filter-active' href="/backend/article-{{ type.0 }}-{{ kwargs.classify_id }}">
+                        {{ type.1 }}
+                    </a>
+                {% else %}
+                    <a href="/backend/article-{{ type.0 }}-{{ kwargs.classify_id }}">{{ type.1 }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="classify">
+            <span style="font-size: 18px"> 自定分类：</span>
+            {% if kwargs.classify_id == 0 %}
+                <a class="filter-active" href="/backend/article-{{ kwargs.article_type_id }}-0">全部</a>
+            {% else %}
+                <a href="/backend/article-{{ kwargs.article_type_id }}-0">全部</a>
+            {% endif %}
+
+            {% for classify in classify_list %}
+                {% if classify.id == kwargs.classify_id %}
+                    <a class="filter-active" href="/backend/article-{{ kwargs.article_type_id }}-{{ classify.id }}">
+                        {{ classify.classify }}</a>
+                {% else %}
+                    <a href="/backend/article-{{ kwargs.article_type_id }}-{{ classify.id }}">
+                        {{ classify.classify }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="srcrow">
+        <i class="fa fa-home" style="padding: 10px 10px"></i><span> 搜索文章（{{ count }}篇）</span>
+        <div class="add-article right">
+            <a type="button" class="btn btn-primary" href="/backend/add-article">
+                <i class="glyphicon glyphicon-plus-sign"></i>
+                添加新文章
+            </a>
+        </div>
+    </div>
+    <div class="article-list">
+        <table class="table">
+            <th>文章标题</th>
+            <th>创建时间</th>
+            <th>操作</th>
+            {% for article in article_list %}
+                <tr>
+                    <td>
+                        <a href="/{{ article.blog.site }}/{{ article.id }}">
+                            {{ article.title }}
+                        </a></td>
+                    <td>{{ article.add_date|date:'Y/m/d' }}</td>
+                    <td class="method"><a href="/backend/edit-article/{{ article.id }}"><i
+                            class="glyphicon glyphicon-pencil ">&nbsp;</i></a>
+                        /&nbsp; <a href="" data-toggle="modal" data-target="#myModal" class="article-del">
+                            <span class="hide">{{ article.id }}</span>
+                            <i class="glyphicon glyphicon-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">确认删除</h4>
+                </div>
+                <div class="modal-body">
+                    <p>确定删除此片文章以及文章的所有相关数据</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger sure" data-dismiss="modal">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <div class="right paginator">
+        <ul class="pagination  pagination-sm ">
+            {{ page_str }}
+        </ul>
+    </div>
+
+
+{% endblock %}
+{% block jsp %}
+    <script src="/static/bootstrap/js/bootstrap.js"></script>
+    <script>
+        $(function () {
+            $('.article-del').bind('click', function () {
+                var aid = $(this).find('span').first().text();
+                $('.sure').bind('click', function () {
+                    $.ajax({
+                        url: '/backend/del-article',
+                        method: 'POST',
+                        data: {'aid': aid},
+                        dataType: 'JSON',
+                        success: function (arg) {
+                            if (arg.status) {
+                                $(this).parent().parent().remove();
+                                window.location.reload()
+                            }
+                            else {
+                                alert('删除失败')
+                            }
+                        }
+                    })
+                })
+            });
+            $('.blog-manage').find('i').last().show();
+            $('.blog-manage').find('i').first().hide();
+            $('.blog-menu').show();
+            $('#article-manage').addClass('menu-active');
+            $('#article-manage').css('color', 'black')
+        })
+    </script>
+{% endblock %}

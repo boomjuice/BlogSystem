@@ -1,0 +1,157 @@
+{% extends 'home/home.html' %}
+
+{% block content %}
+    <div class="article">
+        <h3>{{ article_detail.title }}</h3>
+        <hr>
+        <p class="summary">概要：{{ article_detail.summary }}</p>
+        <hr>
+        <p class="detail">{{ article_detail.bid.content|safe }}</p>
+    </div>
+    <div class="up-down">
+        <div class="up">
+            <span><i class="fa fa-thumbs-o-up fa-2x"></i></span>
+            <span class="up-count">{{ article_detail.up_count }}</span>
+        </div>
+        <div class="down">
+            <span><i class="fa fa-thumbs-o-down fa-2x"></i></span>
+            <span class="down-count">{{ article_detail.down_count }}</span>
+        </div>
+        <div class="author-info">
+            <span>{{ article_detail.add_date|  date:"N d. Y  f  a " }}&nbsp;&nbsp;</span>
+            <a><i class="fa fa-user-secret">&nbsp;</i>{{ user.username }}&nbsp;</a>
+            <a><i class="fa fa-commenting-o">&nbsp;</i>{{ article.articlecomment_set.count }}&nbsp;</a>
+            <a><i class="fa fa-eye">&nbsp;</i>{{ article_detail.read_count }}</a>
+        </div>
+        <div class="article-warning">
+            <div class="icon">
+                <i class="fa fa-telegram "></i>
+            </div>
+            <div class="texts">
+                <h5>作者：<a href="/{{ article_detail.blog.site }}">{{ user.username }}</a></h5>
+                <h5>出处：<a href="/{{ article_detail.blog.site }}/{{ article_detail.id }}">http://www.cnblogs.com/{{ user.pb.site }}/</a></h5>
+                <h5>本文版权归作者所有，欢迎转载，但未经作者同意必须保留次声明，且在文章页面明显位置给出原文链接</h5>
+            </div>
+        </div>
+        <div class="comments">
+            <h4>评论列表</h4>
+            <div class="comment-body">
+                {% for comment in comments %}
+
+                    <div class="comment-item">
+                    <span style="display: none">{{ comment.uid.id }}</span>
+                    <span><a><i class="fa fa-user-circle">&nbsp;</i></a>{{ comment.uid.username }}</span>
+                    <span>&nbsp;{{ comment.create_time }}</span>
+                    <span class="btn btn-warning  reply">回复</span>
+                    <h5>{{ comment.content|safe }}</h5>
+
+                    {% if comment.reply %}
+                        <h5><a><i class="fa fa-arrow-circle-o-right fa-lg"></i></a><a>&nbsp;<i
+                                class="fa fa-user-circle    ">&nbsp;</i></a>
+                            {{ comment.reply.uid.username }}&nbsp;&nbsp;
+                            <span>{{ comment.reply.create_time }}</span></h5>
+                        <h5 style="margin-left: 20px">{{ comment.reply.content|safe }} </h5>
+                        <hr>
+                    {% else %}
+                        <hr>
+                    {% endif %}
+                {% endfor %}
+                </div>
+            </div>
+            <div>
+                <ul class="pagination">
+                    {{ page_str }}
+                </ul>
+            </div>
+
+            <div class="editor">
+
+                <div id="editor1" class="form-control">
+                </div>
+                <div style="padding: 5px 0; color: #ccc"></div>
+                <div id="editor2" class="form-control" style="min-height: 500px;height: auto">
+                </div>
+                {% if not request.session.user %}
+                    <div id="over">
+                        <div>
+                            <h3>请登录后在进行评论</h3>
+                            <a href="{% url 'login' %}"><i class="fa fa-user-o"></i>&nbsp;</a>
+                            <span> /&nbsp; </span>
+                            <a href="{% url 'register' %}"><i class="fa fa-user-plus"></i></a>
+                        </div>
+                    </div>
+                {% endif %}
+                <button class='btn btn-success' id="btn1" style="margin-top: 18px">发表回复</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block jsp %}
+    <script src="/static/js/jquery-3.3.1.js"></script>
+    <script src="/static/js/wangEditor.js"></script>
+    <script>
+        var E = window.wangEditor;
+        var editor = new E('#editor1', '#editor2');
+        editor.customConfig.uploadImgServer = '/upload';
+        editor.customConfig.uploadFileName = 'img';
+        editor.customConfig.showLinkImg = false;
+        editor.create();
+
+        var rid = null;
+        var u = {{ request.session.user.id }};
+        var aid = {{ article_detail.id }};
+        $('.reply').bind('click', function () {
+            rid = $(this).parent().find('span').first().text();
+            $('.w-e-text').focus();
+        });
+        $('.up').bind('click', function () {
+            var updown = 0;
+            $.ajax({
+                url: '/updown',
+                method: 'POST',
+                data: {'uid': u, 'aid': aid, 'updown': updown},
+                dataType: 'JSON',
+                success: function (arg) {
+                    if (arg.status) {
+                        $('.up-count').html("{{ article_detail.up_count| add:'1' }}")
+                    } else {
+                        alert(arg.message)
+                    }
+                }
+            })
+        });
+        $('.down').bind('click', function () {
+            var updown = 1;
+            $.ajax({
+                url: '/updown',
+                method: 'POST',
+                data: {'uid': u, 'aid': aid, 'updown': updown},
+                dataType: 'JSON',
+                success: function (arg) {
+                    if (arg.status) {
+                        $('.down-count').html("{{ article_detail.down_count| add:'1' }}")
+                    } else {
+                        alert(arg.message)
+                    }
+                }
+            })
+        });
+        document.getElementById('btn1').addEventListener('click', function () {
+
+            var comment = editor.txt.html();
+            $.ajax({
+                url: '/comment',
+                method: 'POST',
+                data: {'comment': comment, 'user': u, 'aid': aid, 'rid': rid},
+                dataType: 'JSON',
+                success: function (arg) {
+                    if (arg.status) {
+                        window.location.reload();
+                    }
+                }
+            })
+        }, false)
+
+    </script>
+{% endblock %}

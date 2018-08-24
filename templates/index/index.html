@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>溜溜球的博客</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/fa/css/font-awesome.css">
+
+    <style>
+        .top {
+            margin-left: 5%;
+        }
+
+        .col-md-8 img {
+            height: 70px;
+            width: 70px;
+        }
+
+        .col-md-8 ul li {
+            list-style: none;
+        }
+
+        .col-md-8 .information {
+            margin-top: 8px;
+        }
+
+        .pagination {
+            margin-left: 7%;
+        }
+
+        .information a{
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+{% include 'index/header.html' %}
+<div class="container-fluid" style="margin-left: 5%">
+    <div class="col-md-8" style="position: relative;">
+        {% for article in articles %}
+            <div class="article-summary">
+                <span style="display: none">{{ article.id }}</span>
+                <a href="/{{ article.blog.site }}/{{ article.id }}" class="aid">
+                    <h4>{{ article.title }}</h4>
+                </a>
+                <div class="clearfix">
+                    <a href="" style="float: left;margin-right: 8px">
+                        <img class='img-thumbnail' src="/{{ article.blog.pb.img }}/">
+                    </a>
+                    {{ article.summary }}
+                </div>
+                <div class="information">
+                    <a href="/{{ article.blog.site }}" ><i class="fa fa-user-circle">&nbsp;&nbsp;</i>{{ article.blog.pb.username }}
+                    </a>
+                    <span style="font-size: 12px">发布于{{ article.add_date| date }}&nbsp;&nbsp;</span>
+                    <a><i class="fa fa-th-list">&nbsp;&nbsp;</i>{{ article.articlecomment_set.count }}&nbsp;</a>
+                    <a><i class="fa fa-thumbs-o-up">&nbsp;&nbsp;</i>{{ article.up_count }}</a>
+                    <a><i class="fa fa-eye">&nbsp;&nbsp;</i>{{ article.read_count }}</a>
+                </div>
+                <hr>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="col-md-4">
+
+    </div>
+</div>
+<div>
+    <ul class="pagination">
+        {{ page_str }}
+    </ul>
+</div>
+
+<script src="/static/js/jquery-3.3.1.js"></script>
+<script>
+    $(function () {
+        $('.aid').bind('click', function(){
+        var aid = $(this).parent().find("span").first().text();
+        $.ajax({
+            url: '/read',
+            method: 'POST',
+            data: {'aid': aid},
+            dataType: 'JSON',
+            success: function (arg) {
+                if (arg.status) {
+
+                } else {
+                    console.log(arg.message)
+                }
+            }
+        })})
+    })
+
+
+</script>
+</body>
+</html>

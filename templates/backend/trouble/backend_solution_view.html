@@ -1,0 +1,64 @@
+{% extends 'backend/backend.html' %}
+{% block css %}
+    <link rel="stylesheet" href="/static/js/kindeditor/themes/default/default.css">
+
+{% endblock %}
+{% block contents %}
+    <ol class="breadcrumb" style="margin-bottom: 0;">
+        <li><a href="/backend/trouble">报障管理</a></li>
+        <li class="active">解决方案</li>
+    </ol>
+    <div style="padding: 5px 8px;">
+        <form action="/backend/solution-view/{{ tid }}" method="post" novalidate>
+            <div class="alert alert-info">
+                <h4>故障标题:</h4>
+                <span>{{ trouble.title }}</span>
+            </div>
+            <div class="alert alert-success">
+                <h4>故障内容:</h4>
+                <span>{{ trouble.detail|safe }}</span>
+            </div>
+            <div class="alert alert-warning">
+                <h4>解决方案:</h4>
+                <span>{{ trouble.solution |safe }}</span>
+            </div>
+            {% if trouble.evaluate %}
+                <div class="navbar-header">
+                    <a class="navbar-brand" style="margin-left: 20px; margin-bottom: 20px">评分:</a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <p class="navbar-text">{{ trouble.get_evaluate_display }}</p>
+                </div>
+                <a href="/backend/trouble" type="button" class="btn btn-primary" style="margin-left: 20px">返回保障页面
+                </a>
+            {% else %}
+                <div class="form-group">
+                    <label>对这次处理的满意程度：<span>{{ obj.evaluate.errors.0 }}</span></label>
+                    <div>
+                        {{ obj.evaluate }}
+                    </div>
+                </div>
+                <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="保 存">
+            </div>
+            {% endif %}
+
+        </form>
+    </div>
+
+{% endblock %}
+{% block jsp %}
+    <script charset="utf-8" src="/static/js/kindeditor/kindeditor-all.js"></script>
+    <script charset="utf-8" src="/static/js/kindeditor/lang/zh-CN.js"></script>
+    <script>
+        KindEditor.ready(function (K) {
+            var editor = K.create('#solution', {
+                resizeType: 1,
+                uploadJson: '/upload',
+                width: '100%',
+                height: '500px',
+                filePostName: 'img',
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'home/home.html' %}
+{% block content %}
+    <div class="article-list">
+        {% for article in article_list %}
+            <div class="article-list">
+                <span style="display: none">{{ article.id }}</span>
+                <a href="/{{ article.blog.site }}/{{ article.id }}"  class="bid">
+                    <h4>{{ article.title }}</h4>
+                </a>
+                <div class="create-info">
+                    <a><i class="fa fa-user-circle">&nbsp;&nbsp;</i>{{ article.blog.pb.username }}</a>
+                    <span style="font-size: 12px">发布于{{ article.add_date| date }}&nbsp;&nbsp;</span>
+                    <a><i class="fa fa-th-list">&nbsp;&nbsp;</i>{{ article.articlecomment_set.count }}&nbsp;</a>
+                    <a><i class="fa fa-thumbs-o-up">&nbsp;&nbsp;</i>{{ article.up_count }}&nbsp;</a>
+                    <a href=""><i class="fa fa-eye">&nbsp;&nbsp;</i>{{ article.read_count }}</a>
+                    <hr>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+{% block jsp %}
+<script src="/static/js/jquery-3.3.1.js"></script>
+<script>
+    $('.bid').bind('click',function(){
+      var baid = $(this).parent().find("span").first().text();
+      console.log(baid);
+        $.ajax({
+            url: '/read',
+            method: 'POST',
+            data: {'aid': baid},
+            dataType: 'JSON',
+            success: function (arg) {
+                if (arg.status) {
+
+                } else {
+                    console.log(arg.message)
+                }
+            }
+        })})
+</script>
+{% endblock %}

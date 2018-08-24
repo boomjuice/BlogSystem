@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/fa/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/css/backend/backend.css">
+    {% block css %}
+
+    {% endblock %}
+</head>
+<body>
+<div class="pg-header">
+    <div class="logo left">
+        <i><b>boomjuice</b></i>
+    </div>
+    <div class="hl-item left"><a href="/">博客首页</a></div>
+    <div class="avatar right">
+        <div class="avatar-item">
+            <a href="">
+                <i class="fa fa-user-o fa-2x user-icon"></i>
+            </a>
+        </div>
+        <div class="user-item">
+            <a href="">个人信息</a>
+            <a href="">注销</a>
+        </div>
+    </div>
+    <div class="hr-item right">
+        <a href="">消息&nbsp;&nbsp;<i class="fa fa-coffee"></i></a>
+        <a href="" class="message-num" style="background:burlywood">4</a>
+        <a href="">通知&nbsp;&nbsp;<i class="fa fa-superpowers"></i></a>
+        <a href="" class="message-num" style="background:orange">4</a>
+        <a href="">任务&nbsp;&nbsp;<i class="fa fa-bug"></i></a>
+        <a href="" class="message-num" style="background:#47ee5b">4</a>
+    </div>
+    <div>
+
+    </div>
+</div>
+<div class="pg-body">
+    <div class="menus ">
+        <div class="menu-head blog-manage" >
+            &nbsp;
+            <i class="glyphicon glyphicon-folder-close " >&nbsp;</i>
+            <i class="glyphicon glyphicon-folder-open " style="display: none" >&nbsp;&nbsp;</i>
+            博客管理
+        </div>
+        <div class="menu-item blog-menu" >
+            <a href="/backend/article-0-0" id="article-manage"><i class="fa fa-chain-broken">&nbsp;&nbsp;</i>文章管理</a>
+            <a href=""><i class="fa fa-chain-broken">&nbsp;&nbsp;</i>标签管理</a>
+            <a href=""><i class="fa fa-chain-broken">&nbsp;&nbsp;</i>分类管理</a>
+        </div>
+        <div class="menu-head" style="color: #ff7d12">
+            &nbsp;
+            <i class="glyphicon glyphicon-folder-close">&nbsp;</i>
+            <i class="glyphicon glyphicon-folder-open " style="display: none">&nbsp;&nbsp;</i>
+            权限管理
+        </div>
+        <div class="menu-item power-menu">
+            <a href=""><i class="fa fa-gg">&nbsp;&nbsp;</i>权限菜单</a>
+            <a href=""><i class="fa fa-gg">&nbsp;&nbsp;</i>权限管理</a>
+            <a href=""><i class="fa fa-gg">&nbsp;&nbsp;</i>权限分配</a>
+        </div>
+        <div class="menu-head trouble-manage" style="color: saddlebrown">
+            &nbsp;
+            <i class="glyphicon glyphicon-folder-close">&nbsp;</i>
+            <i class="glyphicon glyphicon-folder-open " style="display: none">&nbsp;&nbsp;</i>
+            报障管理
+        </div>
+        <div class="menu-item trouble-menu">
+            <a href="/backend/trouble" id="trouble"><i class="fa fa-slack">&nbsp;&nbsp;</i>个人报障</a>
+            <a href="/backend/solve-trouble" id="trouble-solve"><i class="fa fa-slack">&nbsp;&nbsp;</i>报障处理</a>
+            <a href="/backend/trouble-table" id="trouble-table"><i class="fa fa-slack">&nbsp;&nbsp;</i>报障统计</a>
+        </div>
+    </div>
+    <div class="contents">
+        {% block contents %}
+
+        {% endblock %}
+    </div>
+</div>
+<script src="/static/js/jquery-3.3.1.js"></script>
+{% block jsp %}
+
+{% endblock %}
+<script>
+    $('.menu-head').bind('click', function () {
+        $(this).find('.glyphicon-folder-close').toggle();
+        $(this).find('.glyphicon-folder-open').toggle();
+        $(this).next().fadeToggle();
+
+    });
+
+</script>
+</body>
+</html>

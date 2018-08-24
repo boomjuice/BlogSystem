@@ -1,0 +1,18 @@
+{% extends 'backend/backend.html'%}
+{% block css %}
+
+{% endblock %}
+{% block contents %}
+    <div class="index-info">
+    <img src="/{{ request.session.user.img }}/" class='right thumbnail' height="400" alt="您还没设置头像呢">
+    {% if request.session.user.nickname %}
+         <h1> &nbsp;&nbsp;欢迎回来：{{ request.session.user.nickname }}</h1>
+    {% else %}
+         <h1> &nbsp;&nbsp;欢迎回来：{{ request.session.user.username }}</h1>
+    {% endif %}
+    </div>
+
+{% endblock %}
+{% block jsp %}
+
+{% endblock %}

@@ -1,0 +1,247 @@
+{% extends 'backend/backend.html' %}
+{% load dealwithtime %}
+{% block css %}
+    <style>
+        .srcrow {
+            background: wheat;
+            border-left: 4px solid indianred;
+            border-top: 2px dashed #eeeeee;
+            border-bottom: 2px dashed #eeeeee;
+        }
+
+        .btn-primary {
+            border-radius: 0%;
+        }
+
+        .article-list {
+            margin-top: 16px;
+            margin-left: 20px;
+            margin-right: 20px;
+            border: 2px solid #eeeeee;
+        }
+
+        .article-list td i, td a {
+            color: saddlebrown;
+            text-decoration: none;
+        }
+
+        .article-list td i {
+            opacity: 0.5;
+        }
+
+        .article-list .table tr:hover {
+            background: burlywood;
+        }
+
+        .article-list .table td i:hover {
+            opacity: 1;
+        }
+
+        .paginator {
+            margin-right: 20px;
+        }
+
+        .modal-backdrop.in {
+            opacity: 0;
+        }
+
+        .modal-backdrop {
+            z-index: -1;
+        }
+    </style>
+{% endblock %}
+{% block contents %}
+    <ol class="breadcrumb">
+        <li><a href="/backend/trouble">报障管理</a></li>
+        <li class="active">报障统计</li>
+    </ol>
+    <div id="container"></div>
+    <div class="srcrow">
+        <i class="fa fa-home" style="padding: 10px 10px"></i><span> 报障数目（{{ count }}篇）</span>
+    </div>
+    <div class="article-list">
+        <table class="table">
+            <th>报障标题</th>
+            <th>报障时间</th>
+            <th>处理人</th>
+            <th>报障状态</th>
+            <th>操作</th>
+            {% for trouble in trouble_list %}
+                <tr>
+                    <td> {{ trouble.title }}</td>
+                    <td>{{ trouble.create_time | date }}</td>
+                    <td>{{ trouble.handler }}</td>
+                    <td>{{ trouble.get_status_display }}</td>
+                    <td class="method">
+                        {% if trouble.status == 3 %}
+                            <a href="/backend/solution-view/{{ trouble.id }}"><i
+                                    class="glyphicon glyphicon-book ">&nbsp;</i></a>
+                            /&nbsp;
+                        {% elif trouble.status == 2 %}
+                            <a><i
+                                    class="glyphicon glyphicon-pencil ">&nbsp;</i></a>
+
+                            /&nbsp;
+                        {% else %}
+                            <a href="/backend/edit-trouble/{{ trouble.id }}"><i
+                                    class="glyphicon glyphicon-pencil ">&nbsp;</i></a>
+
+                            /&nbsp;
+                        {% endif %}
+
+                        <a href="" data-toggle="modal" data-target="#myModal" class="article-del">
+                            <span class="hide">{{ trouble.id }}</span>
+                            <i class="glyphicon glyphicon-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">确认删除</h4>
+                </div>
+                <div class="modal-body">
+                    <p>确定删除此片文章以及文章的所有相关数据</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger sure" data-dismiss="modal">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <div class="right paginator">
+        <ul class="pagination  pagination-sm ">
+            {{ page_str }}
+        </ul>
+    </div>
+
+
+{% endblock %}
+{% block jsp %}
+
+    <script src="/static/bootstrap/js/bootstrap.js"></script>
+     <script src="https://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+    <script>
+        $(function () {
+            $('.article-del').bind('click', function () {
+                var aid = $(this).find('span').first().text();
+                $('.sure').bind('click', function () {
+                    $.ajax({
+                        url: '/backend/del-article',
+                        method: 'POST',
+                        data: {'aid': aid},
+                        dataType: 'JSON',
+                        success: function (arg) {
+                            if (arg.status) {
+                                $(this).parent().parent().remove();
+                                window.location.reload()
+                            }
+                            else {
+                                alert('删除失败')
+                            }
+                        }
+                    })
+                })
+            });
+            initChart();
+            $('.trouble-manage').find('i').first().hide();
+            $('.trouble-manage').find('i').last().show();
+            $('.trouble-menu').show();
+            $('#trouble-table').addClass('menu-active');
+            $('#trouble-table').css('color', 'black');
+
+        });
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            },
+            lang:{
+                months:["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
+            }
+        });
+        function initChart() {
+            var config = {
+                chart: {
+                    type: 'spline'
+                },
+                title: {
+                    text: '动态模拟实时数据'
+                },
+                xAxis: {
+                    type: 'datetime'
+                },
+                yAxis: {
+                    title: {
+                        text: '值'
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.series.name + '</b><br/>' +
+                            Highcharts.dateFormat('%Y-%m-%d', this.x) + '<br/>' +
+                            Highcharts.numberFormat(this.y, 2);
+                    }
+                },
+                legend: {
+                    enabled: true
+                },
+                exporting: {
+                    enabled: false
+                },
+                series: [
+                    {
+                        name: 'A',
+                        data: [
+                            [1491535949788.035, 7.0],
+                            [1491535949888.035, 6.0],
+                            [1491535949988.035, 10.0],
+                            [1491535950088.035, 1.0],
+                        ]
+                    },
+                    {
+                        name: 'B',
+                        data: [
+                            [1491535949788.035, 8.0],
+                            [1491535949888.035, 2.0],
+                            [1491535949988.035, 40.0],
+                            [1491535950088.035, 1.0],
+                        ]
+                    }
+                    ,
+                    {
+                        name: 'C',
+                        data: [
+                            [1491535949788.035, 10.0],
+                            [1491535949888.035, 2.0],
+                            [1491535949988.035, 10.0],
+                            [1491535950088.035, 8.0],
+                        ]
+                    }
+
+                ]
+            };
+            // 数据库中获取 series
+            $.ajax({
+                url: '/backend/trouble-table-json',
+                dataType: 'json',
+                success: function (arg) {
+                    config['series'] = arg;
+                    $('#container').highcharts(config);
+                }
+            })
+
+        }
+    </script>
+{% endblock %}

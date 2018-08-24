@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/fa/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/css/theme/{{ blog.theme }}.css">
+    {% block css %}
+    
+    {% endblock %}
+</head>
+<body>
+<div class="top-box">
+    <div class="title">{{ blog.title }}</div>
+    <div class="menu-list">
+        <a class='menu-item' href="/backend/index">管理</a>
+        <a class='menu-item' href="/">首页</a>
+        <a class='menu-item' href="/{{ blog.site }}">个人主页</a>
+    </div>
+</div>
+<div class="body">
+    <div class="blog-body">
+        <div class="blog-help">
+            <div class="user-info">
+                <div class="notice">公告</div>
+                 <ul class="notice-list">
+                     <img src="/{{ blog.pb.img }}/" alt="">
+                     <li>昵称：{{ blog.pb.nickname }}</li>
+                     <li>粉丝：{{ blog.pb.fans.count }}</li>
+                     <li>关注：{{ blog.pb.f.count }}</li>
+                     <li>邮箱：{{ blog.pb.email }}</li>
+                 </ul>
+                <div class="summary">格言：{{ blog.summary }}</div>
+            </div>
+            <div class="blog-tag">
+                <div class="tag-name">博客标签</div>
+                <ul class="tag">
+                    {% for tag in tags %}
+                        <li><a href="/{{ blog.site }}/tag/{{ tag.id }}">{{ tag.tag }}({{ tag.blogarticle_set.count }})</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="blog-classify">
+                <div class="classify-name">博客分类</div>
+                <ul class="classify">
+                    {% for classify in classifies %}
+                    <li><a href="/{{ blog.site }}/classify/{{ classify.id }}">{{ classify.classify }}({{ classify.blogarticle_set.count }})</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="blog-date">
+                <div class="date-name">发布时间</div>
+                <ul class="date">
+                    {% for time in ctime %}
+                    <li><a href="/{{ blog.site }}/date/{{ time.ctime }}">{{ time.ctime }}({{ time.num }})</a></li>
+                    {% endfor %}
+
+                </ul>
+            </div>
+        </div>
+        <div class="blog-content">
+            {% block content %}
+            
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% block jsp %}
+
+{% endblock %}
+</body>
+</html>

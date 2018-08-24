@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>溜溜球的博客</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/fa/css/font-awesome.css">
+
+    <style>
+        .register {
+            width: 35%;
+            margin: 40px auto;
+            padding: 40px;
+            border: 1px solid whitesmoke;
+            box-shadow: 2px 5px 10px #9d9d9d;
+        }
+
+        p {
+            margin-left: 8px;
+            color: indianred;
+            font-family: 幼圆;
+        }
+    </style>
+</head>
+<body>
+<div class="register">
+    <div style="font-size: 25px; font-weight: bold;text-align: center;">
+        用户注册
+    </div>
+    <form method="post" role="form" action="{% url 'register' %}" >
+        {% csrf_token %}
+        <div class="form-group">
+            <label>用户名</label>
+            <input type="text" class="form-control" placeholder="请输入用户名" name='username' id="id_username">
+            <p>{{ obj.errors.username.0 }}</p>
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">邮箱</label>
+            <input type="email" class="form-control" placeholder="请输入邮箱" name="email" id="id_email">
+            <p>{{ obj.errors.email.0 }}</p>
+        </div>
+        <div class="form-group">
+            <label>密码</label>
+            <input type="password" class="form-control" placeholder="请输入密码" name="password" id="id_password">
+            <p>{{ obj.errors.password.0 }}</p>
+        </div>
+        <div class="form-group">
+            <label>确认密码</label>
+            <input type="password" class="form-control" placeholder="请再次输入密码" name="confirm_pwd" id="id_confirm_pwd">
+            <p>{{ obj.non_field_errors.0 }}</p>
+        </div>
+        <div class="row">
+            <div class="col-md-7" >
+                <label>验证码</label>
+                <input type="text" class="form-control" placeholder="验证码" name="check_code">
+                <p>{{ obj.errors.check_code.0 }}</p>
+            </div>
+            <div class="col-md-5">
+                <label>&nbsp;</label>
+                <img src="{% url 'check_code' %}" alt="加载失败" class="form-control" onclick="changImg(this)">
+            </div>
+
+        </div>
+        <button  class="btn btn-default" style="margin-top: 18px">确认</button>
+    </form>
+</div>
+<script src="/static/js/jquery-3.3.1.js"></script>
+<script>
+    function changImg(ths) {
+        ths.src = ths.src + '?'
+    }
+</script>
+</body>
+</html>

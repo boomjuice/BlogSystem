@@ -1,0 +1,155 @@
+{% extends 'backend/backend.html' %}
+{% load dealwithtime %}
+{% block css %}
+    <style>
+        .srcrow {
+            background: wheat;
+            border-left: 4px solid indianred;
+            border-top: 2px dashed #eeeeee;
+            border-bottom: 2px dashed #eeeeee;
+        }
+
+        .btn-primary {
+            border-radius: 0%;
+        }
+
+        .article-list {
+            margin-top: 16px;
+            margin-left: 20px;
+            margin-right: 20px;
+            border: 2px solid #eeeeee;
+        }
+
+        .article-list td i, td a {
+            color: saddlebrown;
+            text-decoration: none;
+        }
+
+        .article-list td i {
+            opacity: 0.5;
+        }
+
+        .article-list .table tr:hover {
+            background: burlywood;
+        }
+
+        .article-list .table td i:hover {
+            opacity: 1;
+        }
+
+        .paginator {
+            margin-right: 20px;
+        }
+
+        .modal-backdrop.in {
+            opacity: 0;
+        }
+
+        .modal-backdrop {
+            z-index: -1;
+        }
+    </style>
+{% endblock %}
+{% block contents %}
+    <ol class="breadcrumb">
+        <li><a href="/backend/trouble">报障管理</a></li>
+        <li class="active">报障列表</li>
+    </ol>
+    <div class="srcrow">
+        <i class="fa fa-home" style="padding: 10px 10px"></i><span> 报障数目（{{ count }}篇）</span>
+    </div>
+    <div class="article-list">
+        <table class="table">
+            <th>报障标题</th>
+            <th>报障时间</th>
+            <th>报障人</th>
+            <th>报障状态</th>
+            <th>操作</th>
+            {% for trouble in trouble_list %}
+                <tr>
+                    <td> {{ trouble.title }}</td>
+                    <td>{{ trouble.create_time | date }}</td>
+                    <td>{{ trouble.user }}</td>
+                    <td>{{ trouble.get_status_display }}</td>
+
+                    <td class="method">
+                        {% if trouble.status == 3 %}
+                            <a href="/backend/solution-view/{{ trouble.id }}"><i
+                                    class="glyphicon glyphicon-book ">&nbsp;</i></a>
+                            /&nbsp;
+                        {% else %}
+                            <a href="/backend/solve-trouble/{{ trouble.id }}"><i
+                                    class="glyphicon glyphicon-wrench ">&nbsp;</i></a>
+
+                            /&nbsp;
+                            <a href="" data-toggle="modal" data-target="#myModal" class="article-del">
+                                <span class="hide">{{ trouble.id }}</span>
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </a>
+                        {% endif %}
+
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">确认删除</h4>
+                </div>
+                <div class="modal-body">
+                    <p>确定删除此片文章以及文章的所有相关数据</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger sure" data-dismiss="modal">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <div class="right paginator">
+        <ul class="pagination  pagination-sm ">
+            {{ page_str }}
+        </ul>
+    </div>
+
+
+{% endblock %}
+{% block jsp %}
+    <script src="https://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.js"></script>
+    <script>
+        $(function () {
+            $('.article-del').bind('click', function () {
+                var aid = $(this).find('span').first().text();
+                $('.sure').bind('click', function () {
+                    $.ajax({
+                        url: '/backend/del-article',
+                        method: 'POST',
+                        data: {'aid': aid},
+                        dataType: 'JSON',
+                        success: function (arg) {
+                            if (arg.status) {
+                                $(this).parent().parent().remove();
+                                window.location.reload()
+                            }
+                            else {
+                                alert('删除失败')
+                            }
+                        }
+                    })
+                })
+            });
+            $('#trouble-solve').addClass('menu-active');
+            $('#trouble-solve').css('color', 'black');
+            $('.trouble-manage').find('i').first().hide();
+            $('.trouble-manage').find('i').last().show();
+            $('.trouble-menu').show()
+        })
+
+    </script>
+{% endblock %}
